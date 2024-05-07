@@ -9,9 +9,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int speed;
     [SerializeField] private int jumpForce;
 
-    //Falling check
-    [SerializeField] private bool isFalling;
-
     //Ground check
     [SerializeField] private Transform groundCheck;
     [SerializeField] private bool isGrounded;
@@ -76,20 +73,18 @@ public class PlayerController : MonoBehaviour
         {
             if (curPlayingClips[0].clip.name == "Attack")
                 rb.velocity = Vector2.zero;
-            else
+            else if (!Input.GetKey(KeyCode.S))
             {
                 Vector2 moveDirection = new Vector2(xInput * speed, rb.velocity.y);
                 rb.velocity = moveDirection;
             }
         }
-
+        
         //Player will jump
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
-
-        isFalling = (rb.velocity.y < 0);
 
         // Sprite flipping
         if (xInput != 0)
@@ -99,8 +94,9 @@ public class PlayerController : MonoBehaviour
 
         //Set animations to play depending on variables
         anim.SetBool("isAttacking", Input.GetButtonDown("Fire1"));
+        anim.SetBool("isShooting", Input.GetButtonDown("Fire3"));
+        anim.SetBool("isDucking", Input.GetKey(KeyCode.S));
         anim.SetFloat("speed", Mathf.Abs(xInput));
         anim.SetBool("isGrounded", isGrounded);
-        anim.SetBool("isFalling", isFalling);
     }
 }
