@@ -53,7 +53,7 @@ public class Throw : MonoBehaviour
     {
         switch (type)
         {
-            case ThrowableType.Axe:
+            case ThrowableType.Knife:
                 {
                     if (!sr.flipX)
                     {
@@ -69,13 +69,14 @@ public class Throw : MonoBehaviour
                     }
                     break;
                 }
-            case ThrowableType.Knife:
+            case ThrowableType.Axe:
                 {
                     if (!sr.flipX)
                     {
                         Projectile curProjectile = Instantiate(AxePrefab, spawnPointRight.position, spawnPointRight.rotation);
                         curProjectile.xVel = axeXVel;
                         curProjectile.yVel = axeYVel;
+                        curProjectile.GetComponent<Animator>().SetBool("right", true);
                     }
                     else
                     {

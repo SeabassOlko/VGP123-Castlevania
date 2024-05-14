@@ -67,6 +67,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask isGroundLayer;
     [SerializeField] private float groundCheckRadius;
 
+    //Attack variables
+    [SerializeField]private Cooldown cooldown;
+    private bool canThrow = true;
+
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private Animator anim;
@@ -80,6 +84,9 @@ public class PlayerController : MonoBehaviour
         _health = 100;
         _knife = false;
         _axe = false;
+
+        //Set cooldown
+        cooldown.startCooldown();
 
         if (speed <= 0)
         {
@@ -152,16 +159,24 @@ public class PlayerController : MonoBehaviour
             sr.flipX = (xInput < 0);
         }
 
-        if (Input.GetButtonDown("Fire3"))
+        if (Input.GetKeyDown(KeyCode.I)) 
+        {
+            Debug.Log("The Cooldown statement: " + cooldown.isCoolingDown);
+        }
+
+        if (Input.GetButtonDown("Fire3") && _knife && cooldown.isCoolingDown)
         {
             thrw.type = Throw.ThrowableType.Knife;
             thrw.Fire();
             anim.SetBool("isShooting", Input.GetButtonDown("Fire3"));
-        }else if (Input.GetButtonDown("Fire2"))
+            cooldown.startCooldown();
+
+        }else if (Input.GetButtonDown("Fire2") && _axe && cooldown.isCoolingDown)
         {
             thrw.type = Throw.ThrowableType.Axe;
             thrw.Fire();
             anim.SetBool("isShooting", Input.GetButtonDown("Fire2"));
+            cooldown.startCooldown();
         }
 
         //Set animations to play depending on variables

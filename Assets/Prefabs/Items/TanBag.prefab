@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 859457106429194843}
   - component: {fileID: 2191628603337954367}
   - component: {fileID: 4412278857389378216}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: TanBag
   m_TagString: Item
   m_Icon: {fileID: 0}

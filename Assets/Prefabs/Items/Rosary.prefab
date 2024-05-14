@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4899387531539374845}
   - component: {fileID: 4006654899783676672}
   - component: {fileID: 331626978871951518}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Rosary
   m_TagString: Item
   m_Icon: {fileID: 0}

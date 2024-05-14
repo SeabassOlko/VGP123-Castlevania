@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8855684442451523618}
   - component: {fileID: 5003075368413536116}
   - component: {fileID: 1245760620553365772}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PurpleBag
   m_TagString: Item
   m_Icon: {fileID: 0}

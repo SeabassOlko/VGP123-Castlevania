@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5160471825529142960}
   - component: {fileID: 344087011423486222}
   - component: {fileID: 9070273687721021998}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RedBag
   m_TagString: Item
   m_Icon: {fileID: 0}
