@@ -37,8 +37,6 @@ public class PlayerController : MonoBehaviour
     public Action<bool> onAxeValueChange;
     public Action<bool> onKnifeValueChange;
 
-    [SerializeField] private int maxHealth = 10;
-
     //Movement Variables
     [SerializeField] private int speed;
     [SerializeField] private int jumpForce;
@@ -52,7 +50,6 @@ public class PlayerController : MonoBehaviour
 
     //Attack variables
     [SerializeField]private Cooldown cooldown;
-    private bool canThrow = true;
 
     //Player hit box variables
     [SerializeField] private KillBox killBoxRight;
@@ -241,40 +238,30 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             if (collision.gameObject.GetComponent<Enemy>().dead) return;
-
-            hurt = true;
-            anim.SetBool("Hurt", true);
-            GameManager.Instance.health--;
-            if (rb.transform.position.x < collision.transform.position.x)
-            {
-                rb.velocity = Vector3.zero;
-                rb.velocity = Vector2.left * knockback;
-                rb.velocity += Vector2.up * knockback;
-            }
-            else
-            {
-                rb.velocity = Vector3.zero;
-                rb.velocity = Vector2.right * knockback;
-                rb.velocity += Vector2.up * knockback;
-            }
+            hurtCheck(collision);
         }
         if (collision.gameObject.CompareTag("EnemyProjectile"))
         {
-            hurt = true;
-            anim.SetBool("Hurt", true);
-            GameManager.Instance.health--;
-            if (rb.transform.position.x < collision.transform.position.x)
-            {
-                rb.velocity = Vector3.zero;
-                rb.velocity = Vector2.left * knockback;
-                rb.velocity += Vector2.up * knockback;
-            }
-            else
-            {
-                rb.velocity = Vector3.zero;
-                rb.velocity = Vector2.right * knockback;
-                rb.velocity += Vector2.up * knockback;
-            }
+            hurtCheck(collision);
+        }
+    }
+
+    private void hurtCheck(Collision2D collision)
+    {
+        hurt = true;
+        anim.SetBool("Hurt", true);
+        GameManager.Instance.health--;
+        if (rb.transform.position.x < collision.transform.position.x)
+        {
+            rb.velocity = Vector3.zero;
+            rb.velocity = Vector2.left * knockback;
+            rb.velocity += Vector2.up * knockback;
+        }
+        else
+        {
+            rb.velocity = Vector3.zero;
+            rb.velocity = Vector2.right * knockback;
+            rb.velocity += Vector2.up * knockback;
         }
     }
 }
