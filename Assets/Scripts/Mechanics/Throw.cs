@@ -58,13 +58,13 @@ public class Throw : MonoBehaviour
                     if (!sr.flipX)
                     {
                         Projectile curProjectile = Instantiate(knifePrefab, spawnPointRight.position, spawnPointRight.rotation);
-                        curProjectile.xVel = knifeXVel;
+                        curProjectile.xVel = -knifeXVel;
                         curProjectile.yVel = knifeYVel;
                     }
                     else
                     {
                         Projectile curProjectile = Instantiate(knifePrefab, spawnPointLeft.position, spawnPointLeft.rotation);
-                        curProjectile.xVel = -knifeXVel;
+                        curProjectile.xVel = knifeXVel;
                         curProjectile.yVel = knifeYVel;
                     }
                     break;
@@ -74,14 +74,14 @@ public class Throw : MonoBehaviour
                     if (!sr.flipX)
                     {
                         Projectile curProjectile = Instantiate(AxePrefab, spawnPointRight.position, spawnPointRight.rotation);
-                        curProjectile.xVel = axeXVel;
+                        curProjectile.xVel = -axeXVel;
                         curProjectile.yVel = axeYVel;
                         curProjectile.GetComponent<Animator>().SetBool("right", true);
                     }
                     else
                     {
                         Projectile curProjectile = Instantiate(AxePrefab, spawnPointLeft.position, spawnPointLeft.rotation);
-                        curProjectile.xVel = -axeXVel;
+                        curProjectile.xVel = axeXVel;
                         curProjectile.yVel = axeYVel;
                     }
                     break;

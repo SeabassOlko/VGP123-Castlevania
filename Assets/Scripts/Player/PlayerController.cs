@@ -1,40 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(SpriteRenderer), typeof(Animator))]
+[RequireComponent(typeof(AudioSource))]
 public class PlayerController : MonoBehaviour
 {
     //Player Gameplay Variables
-    private int _coins;
-    private int _health;
     private bool _knife;
     private bool _axe;
-
-    public int coins
-    {
-        get => _coins;
-        set
-        {
-            _coins += value;
-            Debug.Log("Current Coins: " + _coins);
-        }
-    }
-    public int health
-    {
-        get => _health;
-        set 
-        {
-            if (value <= 0) GameOver();
-            if (value > maxHealth) _health = maxHealth;
-            _health = value;
-            Debug.Log("Current Health: " + _health);
-        }
-    }
-    private void GameOver()
-    {
-        Debug.Log("You died");
-    }
+    private bool hurt;
 
     public bool knife
     {
@@ -42,6 +19,7 @@ public class PlayerController : MonoBehaviour
         set
         {
             _knife = value;
+            onKnifeValueChange?.Invoke(_knife);
             Debug.Log("Knife is set to: " + _knife);
         }
     }
@@ -51,15 +29,20 @@ public class PlayerController : MonoBehaviour
         set
         {
             _axe = value;
+            onAxeValueChange?.Invoke(_axe);
             Debug.Log("Axe is set to: " +_axe);
         }
     }
+
+    public Action<bool> onAxeValueChange;
+    public Action<bool> onKnifeValueChange;
 
     [SerializeField] private int maxHealth = 10;
 
     //Movement Variables
     [SerializeField] private int speed;
     [SerializeField] private int jumpForce;
+    [SerializeField] private int knockback;
 
     //Ground check
     [SerializeField] private Transform groundCheck;
@@ -71,17 +54,34 @@ public class PlayerController : MonoBehaviour
     [SerializeField]private Cooldown cooldown;
     private bool canThrow = true;
 
+    //Player hit box variables
+    [SerializeField] private KillBox killBoxRight;
+    [SerializeField] private KillBox killBoxLeft;
+
+    [SerializeField] private AudioClip jumpClip;
+    [SerializeField] private AudioClip hurtClip;
+    [SerializeField] private AudioClip collectClip;
+    [SerializeField] private AudioClip whipClip;
+
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private Animator anim;
     private Throw thrw;
+    private AudioSource audioSource;
+
+    private bool _paused = false;
+
+    public bool paused
+    {
+        get => _paused;
+        set => _paused = value;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         //Set player variables
-        _coins = 0;
-        _health = 100;
         _knife = false;
         _axe = false;
 
@@ -130,6 +130,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (paused) return;
+
+
         AnimatorClipInfo[] curPlayingClips = anim.GetCurrentAnimatorClipInfo(0);
         //Get and set movement direction and velocity
         float xInput = Input.GetAxis("Horizontal");
@@ -138,12 +141,15 @@ public class PlayerController : MonoBehaviour
 
         if (curPlayingClips.Length > 0)
         {
-            if (curPlayingClips[0].clip.name == "Attack")
-                rb.velocity = Vector2.zero;
-            else if (!Input.GetKey(KeyCode.S))
+            if (!hurt)
             {
-                Vector2 moveDirection = new Vector2(xInput * speed, rb.velocity.y);
-                rb.velocity = moveDirection;
+                if (curPlayingClips[0].clip.name == "Attack")
+                    rb.velocity = Vector2.zero;
+                else if (!Input.GetKey(KeyCode.S))
+                {
+                    Vector2 moveDirection = new Vector2(xInput * speed, rb.velocity.y);
+                    rb.velocity = moveDirection;
+                }
             }
         }
         
@@ -151,12 +157,13 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            audioSource.PlayOneShot(jumpClip);
         }
 
         // Sprite flipping
         if (xInput != 0)
         {
-            sr.flipX = (xInput < 0);
+            sr.flipX = !(xInput < 0);
         }
 
         if (Input.GetKeyDown(KeyCode.I)) 
@@ -179,11 +186,95 @@ public class PlayerController : MonoBehaviour
             cooldown.startCooldown();
         }
 
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            GameManager.Instance.health--;
+        }
+
         //Set animations to play depending on variables
+
         anim.SetBool("isAttacking", Input.GetButtonDown("Fire1"));
         anim.SetBool("isShooting", Input.GetButtonDown("Fire2") || Input.GetButtonDown("Fire3"));
         anim.SetBool("isDucking", Input.GetKey(KeyCode.S));
         anim.SetFloat("speed", Mathf.Abs(xInput));
         anim.SetBool("isGrounded", isGrounded);
+        
+    }
+
+    public void KillBox()
+    {
+        if (!sr.flipX)
+            killBoxRight.attack();
+        else
+            killBoxLeft.attack();
+    }
+
+    public void KillBoxEnd()
+    {
+        killBoxLeft.finishAttack();
+        killBoxRight.finishAttack();
+    }
+
+    public void notHurt()
+    {
+        anim.SetBool("Hurt", false);
+        hurt = false;
+    }
+
+    public void hit()
+    {
+        audioSource.PlayOneShot(hurtClip);
+    }
+
+    public void collect()
+    {
+        audioSource.PlayOneShot(collectClip);
+    }
+    
+    public void whip()
+    {
+        audioSource.PlayOneShot(whipClip);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            if (collision.gameObject.GetComponent<Enemy>().dead) return;
+
+            hurt = true;
+            anim.SetBool("Hurt", true);
+            GameManager.Instance.health--;
+            if (rb.transform.position.x < collision.transform.position.x)
+            {
+                rb.velocity = Vector3.zero;
+                rb.velocity = Vector2.left * knockback;
+                rb.velocity += Vector2.up * knockback;
+            }
+            else
+            {
+                rb.velocity = Vector3.zero;
+                rb.velocity = Vector2.right * knockback;
+                rb.velocity += Vector2.up * knockback;
+            }
+        }
+        if (collision.gameObject.CompareTag("EnemyProjectile"))
+        {
+            hurt = true;
+            anim.SetBool("Hurt", true);
+            GameManager.Instance.health--;
+            if (rb.transform.position.x < collision.transform.position.x)
+            {
+                rb.velocity = Vector3.zero;
+                rb.velocity = Vector2.left * knockback;
+                rb.velocity += Vector2.up * knockback;
+            }
+            else
+            {
+                rb.velocity = Vector3.zero;
+                rb.velocity = Vector2.right * knockback;
+                rb.velocity += Vector2.up * knockback;
+            }
+        }
     }
 }

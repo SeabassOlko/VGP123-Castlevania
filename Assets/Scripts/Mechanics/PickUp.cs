@@ -21,23 +21,24 @@ public class PickUp : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        
         if (collision.CompareTag("Player"))
         {
             PlayerController pc = collision.GetComponent<PlayerController>();
-
+            pc.collect();
             switch (type)
             {
                 case PickupType.Health:
-                    pc.health++;
+                    GameManager.Instance.health++;
                     break;
                 case PickupType.RedBag:
-                    pc.coins = 50;
+                    GameManager.Instance.coins = 50;
                     break;
                 case PickupType.PurpleBag:
-                    pc.coins = 100;
+                    GameManager.Instance.coins = 100;
                     break;
                 case PickupType.TanBag:
-                    pc.coins = 250;
+                    GameManager.Instance.coins = 250;
                     break;
                 case PickupType.Axe:
                     pc.axe = true;

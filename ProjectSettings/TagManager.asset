@@ -8,6 +8,11 @@ TagManager:
   - Item
   - Solid
   - Weapon
+  - Barrier
+  - Enemy
+  - EnemyProjectile
+  - Environment
+  - KillBox
   layers:
   - Default
   - TransparentFX
@@ -17,8 +22,8 @@ TagManager:
   - UI
   - Player
   - Items
-  - 
-  - 
+  - Enemy
+  - KillBox
   - 
   - 
   - 
@@ -47,4 +52,7 @@ TagManager:
     locked: 0
   - name: Background
     uniqueID: 2043819259
+    locked: 0
+  - name: PlayArea
+    uniqueID: 1978446057
     locked: 0

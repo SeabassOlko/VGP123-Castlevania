@@ -6,6 +6,7 @@ public class WinLose : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Level Completed!");
+        if (collision.CompareTag("Player"))
+            GameManager.Instance.LoadScene("WinScreen");
     }
 }
