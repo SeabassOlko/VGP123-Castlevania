@@ -74,6 +74,7 @@ public class CanvasManager : MonoBehaviour
         if (returnToMenu)
             returnToMenu.onClick.AddListener(delegate {
                 audioSource.PlayOneShot(buttonClip);
+                GameManager.Instance.UnPause();
                 changeAudio = StartCoroutine(WaitChangeSceneCoroutine(0.5f, "Title"));
             });
 

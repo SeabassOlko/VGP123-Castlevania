@@ -120,7 +120,8 @@ public class GameManager : MonoBehaviour
     {
         if (PlayerInstance)
             UnPause();
-        _health = MAX_LIVES;
+        _health = MAX_HEALTH;
+        _lives = MAX_LIVES;
         coins = 0;
         Debug.Log("Lives and coins reset");
         SceneManager.LoadScene(sceneName);
